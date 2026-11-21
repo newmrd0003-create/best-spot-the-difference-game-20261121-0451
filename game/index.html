@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern Town — Spot the Difference</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #141126;
+    color: #f5eeda;
+    font-family: Georgia, 'Times New Roman', serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 16px 12px;
+    user-select: none;
+  }
+  header {
+    width: 1232px;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 6px 4px 8px;
+  }
+  header h1 { font-size: 26px; letter-spacing: 0.5px; color: #ffd76a; white-space: nowrap; }
+  header h1 small { display: block; font-size: 13px; color: #c9bfa5; letter-spacing: 1px; }
+  .hud { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 15px; }
+  .hud .pill {
+    background: #241f3d;
+    border: 1px solid #4a3f6e;
+    border-radius: 999px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+  #hud-counter {
+    background: #3a2c10;
+    border-color: #ffd76a;
+    color: #ffd76a;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  #hud-time { font-size: 20px; font-weight: bold; min-width: 58px; text-align: center; }
+  #hud-time.low { color: #ff6b6b; animation: pulse 0.7s infinite; }
+  @keyframes pulse { 50% { opacity: 0.45; } }
+  .hud button {
+    font-family: inherit;
+    font-size: 14px;
+    background: #2f6f8f;
+    color: #fff;
+    border: 1px solid #7dd3fc;
+    border-radius: 999px;
+    padding: 6px 13px;
+    cursor: pointer;
+  }
+  .hud button:disabled { opacity: 0.4; cursor: default; }
+  .hud button:hover:not(:disabled) { background: #3a84a8; }
+  #btn-mute { background: #241f3d; border-color: #4a3f6e; }
+  #time-track {
+    width: 1232px;
+    max-width: 100%;
+    height: 8px;
+    background: #241f3d;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  #time-bar { height: 100%; width: 100%; background: #ffd76a; border-radius: 99px; transition: width 0.2s linear; }
+  #time-bar.low { background: #ff6b6b; }
+  .stage { position: relative; width: 1232px; max-width: 100%; }
+  #panels { display: flex; gap: 16px; justify-content: center; }
+  #panels.dimmed canvas { filter: brightness(0.45) saturate(0.7); }
+  .panel-wrap { position: relative; }
+  .panel-wrap canvas {
+    display: block;
+    width: 600px;
+    height: 440px;
+    max-width: 48vw;
+    border: 3px solid #4a3f6e;
+    border-radius: 12px;
+    cursor: crosshair;
+    background: #0b0a18;
+  }
+  .panel-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(10, 8, 24, 0.75);
+    border: 1px solid #4a3f6e;
+    border-radius: 999px;
+    padding: 3px 11px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+  #toast {
+    margin-top: 10px;
+    min-height: 24px;
+    font-size: 16px;
+    color: #ffe9a8;
+    opacity: 0;
+    transition: opacity 0.25s;
+    text-align: center;
+  }
+  #toast.visible { opacity: 1; }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 8, 24, 0.55);
+    border-radius: 12px;
+    z-index: 5;
+  }
+  .overlay.hidden { display: none; }
+  .card {
+    background: #1e1933;
+    border: 2px solid #ffd76a;
+    border-radius: 16px;
+    padding: 26px 34px;
+    max-width: 640px;
+    text-align: center;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  }
+  .card h2 { font-size: 30px; color: #ffd76a; margin-bottom: 8px; }
+  .card p { font-size: 16px; line-height: 1.5; color: #e8dfc8; margin-bottom: 12px; }
+  .card .big { font-size: 34px; letter-spacing: 6px; color: #ffd76a; margin: 6px 0 10px; }
+  .level-card {
+    text-align: left;
+    background: #241f3d;
+    border: 1px solid #4a3f6e;
+    border-radius: 10px;
+    padding: 9px 14px;
+    margin: 7px 0;
+    font-size: 15px;
+  }
+  .level-card strong { display: block; color: #ffd76a; font-size: 16px; }
+  .level-card span { color: #c9bfa5; font-size: 14px; }
+  .big-btn {
+    font-family: inherit;
+    font-size: 19px;
+    font-weight: bold;
+    background: #ffd76a;
+    color: #241a05;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 34px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  .big-btn:hover { background: #ffe08a; }
+  .keys { font-size: 13px; color: #9a92b5; margin-top: 12px; }
+  footer { margin-top: 6px; font-size: 13px; color: #9a92b5; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏮 Lantern Town<small>SPOT THE DIFFERENCE</small></h1>
+  <div class="hud">
+    <span class="pill" id="hud-level">Level 1 of 3 · Harbour at Dusk</span>
+    <span class="pill" id="hud-counter">0 of 7 found · 7 remaining</span>
+    <span class="pill" id="hud-score">Score 0</span>
+    <span class="pill" id="hud-combo"></span>
+    <span class="pill" id="hud-time">2:00</span>
+    <button id="hud-hint-btn" type="button">💡 Hint (<span id="hud-hints">Hints 3</span>)</button>
+    <button id="btn-mute" type="button">🔊 Sound on</button>
+  </div>
+</header>
+<div id="time-track"><div id="time-bar"></div></div>
+
+<div class="stage">
+  <div id="panels">
+    <div class="panel-wrap">
+      <canvas id="panel-left" width="600" height="440"></canvas>
+      <span class="panel-tag">LEFT · ORIGINAL</span>
+    </div>
+    <div class="panel-wrap">
+      <canvas id="panel-right" width="600" height="440"></canvas>
+      <span class="panel-tag">RIGHT · SPOT 7 CHANGES</span>
+    </div>
+  </div>
+
+  <div class="overlay" id="screen-start">
+    <div class="card">
+      <h2>🏮 Lantern Town</h2>
+      <p>Two pictures hang side by side — but they are <b>not</b> the same.
+      Find all <b>7 differences</b> in each scene before the lantern burns down.
+      Click a difference on either picture to ring it in gold.</p>
+      <div id="level-list"></div>
+      <button class="big-btn" id="btn-play" type="button">▶ Start the hunt</button>
+      <div class="keys">Click a difference · H for a hint (3 per level) · wrong clicks cost 3 seconds</div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="screen-level-complete">
+    <div class="card">
+      <h2 id="complete-title">Harbour at Dusk cleared!</h2>
+      <div class="big" id="complete-stars">★★★</div>
+      <p id="complete-detail"></p>
+      <button class="big-btn" id="btn-next" type="button">Next scene →</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="screen-game-over">
+    <div class="card">
+      <h2>⏳ Time's up!</h2>
+      <p id="over-detail"></p>
+      <p>The differences are still hiding. Try the scene again — you know where some of them are now.</p>
+      <button class="big-btn" id="btn-retry" type="button">↻ Try again</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="screen-all-complete">
+    <div class="card">
+      <h2>🎉 Lantern Master!</h2>
+      <div class="big">★★★</div>
+      <p>You found every difference in all three scenes of Lantern Town.</p>
+      <p id="all-score"></p>
+      <button class="big-btn" id="btn-again" type="button">↻ Play again</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<footer>Three original scenes, painted live in your browser · no downloads, no accounts · Lantern Town © 2026</footer>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
