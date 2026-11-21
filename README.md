@@ -9,6 +9,13 @@ offline in a desktop browser from its own static files. Two near-identical
 pictures hang side by side — find all **7 differences** in each scene before
 the lantern burns down.
 
+## About
+
+Lantern Town is an original spot-the-difference game built for the make.fun
+bounty "Make the best spot the difference game". Three hand-painted procedural
+scenes, seven hidden differences each, a countdown lantern, hints, combos and
+WebAudio sounds — all running offline from static files in a desktop browser.
+
 ## The game
 
 - **3 original scenes, painted procedurally on canvas** — no image files, no
