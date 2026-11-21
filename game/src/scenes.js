@@ -1,4 +1,4 @@
-// scenes.js — one clear job: paint the three original scenes.
+// scenes.js — one clear job: paint the six original scenes.
 //
 // Every scene is drawn procedurally on a 600 x 440 canvas, with no image
 // file anywhere. Each painter takes (ctx, changed): `changed` is a Set of
@@ -489,6 +489,343 @@ function drawStarfish(ctx, x, y, colour) {
   circle(ctx, x, y, 4, '#e67e22');
 }
 
+// -------------------------------------------------------------------- park
+
+export function drawPark(ctx, changed) {
+  // Bright summer sky, sun high, white clouds drifting.
+  vGradient(ctx, [[0, '#6ec1f5'], [0.55, '#a8dcf8'], [0.68, '#dff5e1']]);
+  circle(ctx, 78, 66, 30, '#fff3a0');
+  circle(ctx, 78, 66, 44, 'rgba(255, 243, 160, 0.3)');
+  ctx.strokeStyle = '#f5c542';
+  ctx.lineWidth = 3;
+  for (let i = 0; i < 8; i++) {
+    const a = (i * Math.PI) / 4;
+    ctx.beginPath();
+    ctx.moveTo(78 + Math.cos(a) * 48, 66 + Math.sin(a) * 48);
+    ctx.lineTo(78 + Math.cos(a) * 60, 66 + Math.sin(a) * 60);
+    ctx.stroke();
+  }
+  ellipse(ctx, 300, 60, 46, 16, '#ffffff');
+  ellipse(ctx, 330, 52, 34, 13, '#ffffff');
+  ellipse(ctx, 540, 110, 40, 14, '#ffffff');
+  // A red kite, high on the right — gone from the right picture.
+  if (!changed.has('kite-vanished')) {
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.moveTo(480, 48);
+    ctx.lineTo(502, 72);
+    ctx.lineTo(480, 96);
+    ctx.lineTo(458, 72);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#7a3b12';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(480, 96);
+    ctx.quadraticCurveTo(470, 130, 486, 152);
+    ctx.stroke();
+  }
+  // One bird in the sky — flown away on the right.
+  if (!changed.has('bird-vanished')) gull(ctx, 200, 58, 1, '#2c4a6b');
+  gull(ctx, 250, 84, 0.8, '#2c4a6b');
+  // Green lawn.
+  ctx.fillStyle = '#58b368';
+  ctx.fillRect(0, 300, W, 140);
+  ctx.fillStyle = '#4aa35c';
+  ctx.fillRect(0, 300, W, 10);
+  // Big tree on the left, three red apples — one fell off on the right.
+  ctx.fillStyle = '#7a4a21';
+  ctx.fillRect(66, 170, 18, 132);
+  circle(ctx, 76, 130, 62, '#2f9e44');
+  circle(ctx, 120, 108, 48, '#37b24d');
+  circle(ctx, 40, 108, 42, '#2f9e44');
+  circle(ctx, 100, 110, 7, '#e74c3c');
+  circle(ctx, 130, 130, 7, '#e74c3c');
+  if (!changed.has('tree-apple')) circle(ctx, 118, 118, 7, '#e74c3c');
+  // Picnic blanket, red checks — one stripe turns blue on the right.
+  const stripeColour = changed.has('blanket-stripe') ? '#2471a3' : '#e74c3c';
+  ctx.fillStyle = '#fdf6e3';
+  ctx.fillRect(200, 300, 200, 80);
+  ctx.fillStyle = stripeColour;
+  for (let i = 0; i < 4; i++) ctx.fillRect(200 + i * 50, 300, 25, 80);
+  ctx.fillStyle = stripeColour;
+  for (let i = 0; i < 2; i++) ctx.fillRect(200, 300 + i * 40, 200, 20);
+  // Wicker basket with a bottle beside it — the bottle is gone on the right.
+  ctx.fillStyle = '#b07a3a';
+  ctx.beginPath();
+  ctx.ellipse(340, 330, 34, 20, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#7a4a21';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(318, 318);
+  ctx.quadraticCurveTo(340, 296, 362, 318);
+  ctx.stroke();
+  if (!changed.has('bottle-vanished')) {
+    ctx.fillStyle = '#2471a3';
+    ctx.fillRect(376, 282, 12, 32);
+    ctx.fillStyle = '#f5e6c8';
+    ctx.fillRect(379, 276, 6, 8);
+  }
+  // Beach ball on the grass — its red panel turns yellow on the right.
+  circle(ctx, 520, 362, 22, '#ffffff');
+  ctx.fillStyle = changed.has('ball-colour') ? '#f1c40f' : '#e74c3c';
+  ctx.beginPath();
+  ctx.moveTo(520, 340);
+  ctx.arc(520, 362, 22, -Math.PI / 2, Math.PI / 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#2471a3';
+  ctx.beginPath();
+  ctx.moveTo(520, 340);
+  ctx.arc(520, 362, 22, Math.PI / 6, Math.PI / 2 + 0.6);
+  ctx.closePath();
+  ctx.fill();
+  // Three daisies in the grass — one is missing on the right.
+  for (const [fx, fy] of [[60, 380], [92, 382], [130, 390]]) {
+    if (changed.has('flower-count') && fx === 92) continue;
+    circle(ctx, fx, fy, 6, '#ffffff');
+    circle(ctx, fx, fy, 3, '#f1c40f');
+  }
+}
+
+// ----------------------------------------------------------------- library
+
+export function drawLibrary(ctx, changed) {
+  // Warm cream walls, wooden floor.
+  vGradient(ctx, [[0, '#f3e2c2'], [0.7, '#e8cfa0'], [1, '#d9b078']]);
+  ctx.fillStyle = '#a4713b';
+  ctx.fillRect(0, 360, W, 80);
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 2;
+  for (let x = 0; x < W; x += 60) {
+    ctx.beginPath();
+    ctx.moveTo(x, 360);
+    ctx.lineTo(x - 14, 440);
+    ctx.stroke();
+  }
+  // Tall window on the right, blue sky outside — a bird appears on the right.
+  ctx.fillStyle = '#7ec8f5';
+  ctx.fillRect(380, 40, 180, 190);
+  ctx.fillStyle = '#ffffff';
+  ellipse(ctx, 420, 70, 26, 10, '#ffffff');
+  ellipse(ctx, 500, 100, 30, 11, '#ffffff');
+  if (changed.has('window-bird')) gull(ctx, 420, 88, 0.9, '#2c4a6b');
+  ctx.strokeStyle = '#6e4a1f';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(380, 40, 180, 190);
+  ctx.beginPath();
+  ctx.moveTo(470, 40);
+  ctx.lineTo(470, 230);
+  ctx.moveTo(380, 135);
+  ctx.lineTo(560, 135);
+  ctx.stroke();
+  // Bookshelves: three shelves of colourful spines.
+  const shelfColours = ['#c0392b', '#2471a3', '#27ae60', '#8e44ad', '#e67e22', '#2c3e50'];
+  for (const sy of [60, 150, 240]) {
+    ctx.fillStyle = '#6e4a1f';
+    ctx.fillRect(30, sy + 74, 300, 10);
+    for (let i = 0; i < 9; i++) {
+      // One book is missing from the middle shelf on the right.
+      if (changed.has('book-vanished') && sy === 150 && i === 5) continue;
+      ctx.fillStyle = shelfColours[(i + sy / 30) % 6];
+      const bw = i === 3 ? 20 : 26;
+      ctx.fillRect(38 + i * 30, sy + 74 - 58, bw, 58);
+    }
+  }
+  // Reading lamp on the left table — green shade on the left, red on the right.
+  ctx.fillStyle = '#5d3a1a';
+  ctx.fillRect(86, 240, 10, 120);
+  ctx.fillStyle = changed.has('lamp-colour') ? '#c0392b' : '#27ae60';
+  ctx.beginPath();
+  ctx.moveTo(58, 240);
+  ctx.lineTo(126, 240);
+  ctx.lineTo(112, 196);
+  ctx.lineTo(72, 196);
+  ctx.closePath();
+  ctx.fill();
+  circle(ctx, 92, 148, 26, 'rgba(255, 220, 130, 0.35)');
+  // Wall clock above the window — its hands move on the right.
+  circle(ctx, 520, 72, 26, '#fdf6e3');
+  ctx.strokeStyle = '#6e4a1f';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(520, 72, 26, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = '#2c3e50';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(520, 72);
+  if (changed.has('clock-hands')) {
+    ctx.lineTo(520, 52);
+    ctx.moveTo(520, 72);
+    ctx.lineTo(536, 80);
+  } else {
+    ctx.lineTo(534, 60);
+    ctx.moveTo(520, 72);
+    ctx.lineTo(508, 84);
+  }
+  ctx.stroke();
+  // Armchair with a sleeping cat — the cat is gone on the right.
+  ctx.fillStyle = '#8e44ad';
+  ctx.beginPath();
+  ctx.ellipse(468, 330, 52, 34, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(424, 268, 88, 44);
+  ctx.fillStyle = '#7d3c98';
+  ctx.fillRect(424, 268, 16, 60);
+  ctx.fillRect(496, 268, 16, 60);
+  if (!changed.has('cat-vanished')) {
+    ctx.fillStyle = '#2c2c34';
+    ellipse(ctx, 468, 302, 24, 11, '#2c2c34');
+    circle(ctx, 486, 294, 9, '#2c2c34');
+    ctx.beginPath();
+    ctx.moveTo(480, 288);
+    ctx.lineTo(482, 278);
+    ctx.lineTo(486, 287);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Table with a mug and a potted plant.
+  ctx.fillStyle = '#5d3a1a';
+  ctx.fillRect(160, 340, 120, 12);
+  ctx.fillRect(172, 352, 10, 60);
+  ctx.fillRect(258, 352, 10, 60);
+  if (!changed.has('mug-vanished')) {
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(192, 306, 22, 30);
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(218, 321, 9, -Math.PI / 2, Math.PI / 2);
+    ctx.stroke();
+  }
+  ctx.fillStyle = changed.has('pot-colour') ? '#2471a3' : '#c96f4a';
+  ctx.beginPath();
+  ctx.moveTo(108, 318);
+  ctx.lineTo(136, 318);
+  ctx.lineTo(130, 344);
+  ctx.lineTo(114, 344);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#27ae60';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(122, 318);
+  ctx.quadraticCurveTo(110, 292, 122, 282);
+  ctx.moveTo(122, 318);
+  ctx.quadraticCurveTo(134, 294, 126, 280);
+  ctx.stroke();
+}
+
+// ------------------------------------------------------------------- space
+
+export function drawSpace(ctx, changed) {
+  // Bright station interior: pale panels, steel floor.
+  vGradient(ctx, [[0, '#e8edf2'], [0.7, '#cfd8e0'], [1, '#aab6c2']]);
+  ctx.strokeStyle = 'rgba(60, 80, 100, 0.25)';
+  ctx.lineWidth = 2;
+  for (let x = 0; x < W; x += 75) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 360);
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#8fa0b0';
+  ctx.fillRect(0, 360, W, 80);
+  // The great round window: Earth, clouds and stars.
+  ctx.fillStyle = '#2c3e50';
+  ctx.beginPath();
+  ctx.arc(300, 180, 122, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(300, 180, 112, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.fillStyle = '#0b1e3a';
+  ctx.fillRect(188, 68, 224, 224);
+  circle(ctx, 300, 210, 74, '#2471a3');
+  ellipse(ctx, 270, 190, 34, 16, '#27ae60');
+  ellipse(ctx, 322, 232, 26, 12, '#2ecc71');
+  ellipse(ctx, 300, 240, 18, 8, '#27ae60');
+  if (!changed.has('earth-cloud')) {
+    ellipse(ctx, 300, 178, 30, 10, '#ffffff');
+    ellipse(ctx, 318, 172, 20, 8, '#ffffff');
+  }
+  star(ctx, 452, 78, 5, '#ffffff');
+  if (!changed.has('star-vanished')) star(ctx, 236, 108, 4, '#ffffff');
+  star(ctx, 372, 96, 4, '#ffeec2');
+  ctx.restore();
+  ctx.strokeStyle = '#7dd3fc';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(300, 180, 112, 0, Math.PI * 2);
+  ctx.stroke();
+  // Floating astronaut on the left — patch red on the left, blue on the right.
+  ctx.fillStyle = '#f2f5f7';
+  ellipse(ctx, 150, 298, 30, 38, '#f2f5f7');
+  circle(ctx, 150, 246, 22, '#f2f5f7');
+  circle(ctx, 150, 246, 14, '#7dd3fc');
+  ctx.fillStyle = changed.has('patch-colour') ? '#2471a3' : '#c0392b';
+  ctx.fillRect(138, 290, 24, 14);
+  ctx.strokeStyle = '#d5dde3';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(124, 320);
+  ctx.lineTo(104, 348);
+  ctx.moveTo(176, 320);
+  ctx.lineTo(196, 348);
+  ctx.stroke();
+  // Control panel on the right: lights, one dark on the right, big button.
+  ctx.fillStyle = '#3a4a5a';
+  ctx.fillRect(470, 90, 110, 120);
+  for (let i = 0; i < 6; i++) {
+    const lx = 486 + (i % 3) * 34;
+    const ly = 108 + Math.floor(i / 3) * 26;
+    if (changed.has('panel-light') && i === 4) circle(ctx, lx, ly, 7, '#1c2733');
+    else circle(ctx, lx, ly, 7, i % 2 ? '#2ecc71' : '#f1c40f');
+  }
+  circle(ctx, 520, 178, 16, changed.has('button-colour') ? '#27ae60' : '#e74c3c');
+  ctx.strokeStyle = '#f2f5f7';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(520, 178, 16, 0, Math.PI * 2);
+  ctx.stroke();
+  // A potted plant, tethered — one leaf fewer on the right.
+  ctx.fillStyle = '#c96f4a';
+  ctx.beginPath();
+  ctx.moveTo(78, 358);
+  ctx.lineTo(106, 358);
+  ctx.lineTo(100, 384);
+  ctx.lineTo(84, 384);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#27ae60';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(92, 358);
+  ctx.quadraticCurveTo(80, 332, 92, 322);
+  ctx.moveTo(92, 358);
+  ctx.quadraticCurveTo(104, 334, 98, 320);
+  ctx.stroke();
+  if (!changed.has('leaf-vanished')) {
+    ctx.beginPath();
+    ctx.moveTo(92, 358);
+    ctx.quadraticCurveTo(70, 344, 66, 326);
+    ctx.stroke();
+  }
+  // A floating mug — drifted across the cabin on the right.
+  const mugX = changed.has('mug-moved') ? 428 : 382;
+  const mugY = changed.has('mug-moved') ? 268 : 298;
+  ctx.fillStyle = '#8e44ad';
+  ctx.fillRect(mugX - 10, mugY - 14, 20, 28);
+  ctx.strokeStyle = '#8e44ad';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(mugX + 12, mugY, 8, -Math.PI / 2, Math.PI / 2);
+  ctx.stroke();
+}
+
 // SCENES — the catalogue the rest of the game reads: id, title, subtitle,
 // painter, time limit in seconds, and a short tip shown on the start card.
 export const SCENES = [
@@ -515,6 +852,30 @@ export const SCENES = [
     painter: drawCoral,
     timeLimit: 90,
     tip: 'The fish are honest — one of them is lying.',
+  },
+  {
+    id: 'park',
+    title: 'Sunny Park Picnic',
+    subtitle: 'Bright daylight, seven sneaky shifts on the lawn.',
+    painter: drawPark,
+    timeLimit: 120,
+    tip: 'The tree, the kite and the blanket each hide one.',
+  },
+  {
+    id: 'library',
+    title: 'Cozy Library',
+    subtitle: 'Shelves, lamp light and a sleeping cat — seven shifts.',
+    painter: drawLibrary,
+    timeLimit: 105,
+    tip: 'Count the books on the middle shelf, then the lamp.',
+  },
+  {
+    id: 'space',
+    title: 'Space Station Window',
+    subtitle: 'Earth through the porthole — seven things drifted.',
+    painter: drawSpace,
+    timeLimit: 105,
+    tip: 'Watch the Earth, the panel lights and the floating mug.',
   },
 ];
 

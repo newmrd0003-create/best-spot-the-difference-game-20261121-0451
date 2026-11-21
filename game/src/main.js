@@ -8,8 +8,10 @@
 import { createState, SCREENS, currentScene, startLevel, foundCount, remainingCount, isLevelDone, registerFind, registerMiss, useHint, finishLevel, nextLevel, POINTS } from './state.js';
 import { createTimer, startTimer, stopTimer, tickTimer, timeFraction, formatTime, isLowTime } from './timer.js';
 import { createAudio, playFound, playMiss, playHint, playClick, playWin, playLose, toggleMute } from './audio.js';
-import { createRenderer, renderFrame, markFound, shake } from './render.js';
+import { createRenderer, renderFrame, markFound, shake, setCrosshair } from './render.js';
 import { attachPanelClicks, hitTest } from './input.js';
+import { createMagnifier, attachMagnifier, setMagnifierEnabled } from './magnifier.js';
+import { createCrosshair, attachKeyboard } from './keyboard.js';
 import { differencesFor } from './differences.js';
 import { SCENES } from './scenes.js';
 import { applyShot, shotFromUrl } from './shots.js';
@@ -20,6 +22,9 @@ const state = createState();
 const timer = createTimer();
 const audio = createAudio();
 const renderer = createRenderer($('panel-left'), $('panel-right'));
+const magnifier = createMagnifier($('lens-canvas'));
+const crosshair = createCrosshair();
+setCrosshair(renderer, crosshair);
 
 let toastTimer = 0;
 
@@ -35,7 +40,7 @@ function showToast(text) {
 // updateHud() — refresh every HUD number from the state, once a frame.
 function updateHud() {
   const scene = currentScene(state);
-  $('hud-level').textContent = `Level ${state.levelIndex + 1} of 3 · ${scene.title}`;
+  $('hud-level').textContent = `Level ${state.levelIndex + 1} of ${SCENES.length} · ${scene.title}`;
   $('hud-score').textContent = `Score ${state.score}`;
   $('hud-combo').textContent = state.combo > 1 ? `Combo ×${state.combo}` : '';
   $('hud-counter').textContent = `${foundCount(state)} of ${differencesFor(scene.id).length} found · ${remainingCount(state)} remaining`;
@@ -46,6 +51,9 @@ function updateHud() {
   const bar = $('time-bar');
   bar.style.width = `${timeFraction(state, scene) * 100}%`;
   bar.classList.toggle('low', isLowTime(state, scene));
+  for (const btn of document.querySelectorAll('#scene-nav button')) {
+    btn.classList.toggle('active', Number(btn.dataset.scene) === state.levelIndex);
+  }
 }
 
 // showScreen(name) — switch which overlay card is visible.
@@ -62,6 +70,23 @@ function startGame() {
   startLevel(state, 0);
   startTimer(timer);
   showScreen('');
+}
+
+// jumpToScene(index) — jump straight to any scene, from any screen.
+function jumpToScene(index) {
+  if (index < 0 || index >= SCENES.length) return;
+  playClick(audio);
+  startLevel(state, index);
+  startTimer(timer);
+  showScreen('');
+}
+
+// toggleLens() — switch the magnifier on or off, button and key agree.
+function toggleLens() {
+  const on = setMagnifierEnabled(magnifier, !magnifier.enabled);
+  $('btn-lens').textContent = on ? '🔍 Lens on' : '🔍 Lens off';
+  $('btn-lens').classList.toggle('on', on);
+  showToast(on ? 'Magnifier on — hover a picture to zoom in 2×.' : 'Magnifier off.');
 }
 
 // onPanelPoint(point) — one click on either panel, in scene coordinates.
@@ -111,9 +136,23 @@ function fillLevelComplete() {
     `All 7 differences found · time bonus +${state.levelBonus} · best combo ×${state.bestCombo} · score ${state.score}`;
 }
 
-// fillAllComplete() — the final card after the third level.
+// fillAllComplete() — the final card after the sixth level.
 function fillAllComplete() {
   $('all-score').textContent = `Final score ${state.score} · ${state.totalFound} differences found · best combo ×${state.bestCombo}`;
+}
+
+// fillSceneNav() — the 1–6 scene buttons under the panels.
+function fillSceneNav() {
+  const nav = $('scene-nav');
+  nav.innerHTML = '';
+  for (const [i, scene] of SCENES.entries()) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.dataset.scene = String(i);
+    btn.textContent = `${i + 1}. ${scene.title}`;
+    btn.addEventListener('click', () => jumpToScene(i));
+    nav.appendChild(btn);
+  }
 }
 
 // fillStartScreen() — the three level cards on the title screen.
@@ -168,19 +207,34 @@ $('btn-again').addEventListener('click', () => {
   showScreen('');
 });
 $('hud-hint-btn').addEventListener('click', onHint);
+$('btn-lens').addEventListener('click', toggleLens);
 $('btn-mute').addEventListener('click', (event) => {
   const muted = toggleMute(audio);
   event.currentTarget.textContent = muted ? '🔇 Sound off' : '🔊 Sound on';
 });
 attachPanelClicks($('panel-left'), $('panel-right'), onPanelPoint);
+attachMagnifier(magnifier, $('panel-left'), $('panel-right'));
+attachKeyboard(crosshair, {
+  onGuess: (point) => onPanelPoint(point),
+  onHint,
+  onToggleLens: toggleLens,
+  onNextScene: () => {
+    if (state.screen === SCREENS.PLAYING || state.screen === SCREENS.LEVEL_COMPLETE) jumpToScene(state.levelIndex + 1);
+  },
+  onRestart: () => {
+    if (state.screen === SCREENS.PLAYING) jumpToScene(state.levelIndex);
+  },
+  onJumpScene: (index) => jumpToScene(index),
+  onStart: () => {},
+});
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'h' || event.key === 'H') onHint();
   if (event.key === 'Enter' && state.screen === SCREENS.START) startGame();
 });
 
 // Behind the overlays the harbour is always painted, so the title screen
 // already shows the two panels and what the game is about.
 fillStartScreen();
+fillSceneNav();
 if (!applyShot(state, timer, shotFromUrl())) {
   state.screen = SCREENS.START;
   showScreen('start');

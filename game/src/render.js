@@ -21,7 +21,34 @@ export function createRenderer(left, right) {
     popAt: new Map(),
     rippleAt: new Map(),
     shakeUntil: 0,
+    crosshair: null,
   };
+}
+
+// setCrosshair(renderer, crosshair) — the keyboard crosshair to draw, if any.
+export function setCrosshair(renderer, crosshair) {
+  renderer.crosshair = crosshair;
+}
+
+// drawCrosshair(ctx, crosshair) — a gold crosshair at the keyboard cursor.
+function drawCrosshair(ctx, crosshair) {
+  ctx.save();
+  ctx.strokeStyle = '#ffd76a';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(crosshair.x, crosshair.y, 18, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(crosshair.x - 28, crosshair.y);
+  ctx.lineTo(crosshair.x - 10, crosshair.y);
+  ctx.moveTo(crosshair.x + 10, crosshair.y);
+  ctx.lineTo(crosshair.x + 28, crosshair.y);
+  ctx.moveTo(crosshair.x, crosshair.y - 28);
+  ctx.lineTo(crosshair.x, crosshair.y - 10);
+  ctx.moveTo(crosshair.x, crosshair.y + 10);
+  ctx.lineTo(crosshair.x, crosshair.y + 28);
+  ctx.stroke();
+  ctx.restore();
 }
 
 // allDiffIds(sceneId) — the Set of every difference id, for the right panel.
@@ -103,9 +130,9 @@ export function renderFrame(renderer, state, scene) {
   const dx = shakeMs > 0 ? (Math.random() - 0.5) * 7 : 0;
   const dy = shakeMs > 0 ? (Math.random() - 0.5) * 7 : 0;
 
-  for (const [ctx, changed] of [
-    [renderer.leftCtx, new Set()],
-    [renderer.rightCtx, allDiffIds(scene.id)],
+  for (const [ctx, changed, side] of [
+    [renderer.leftCtx, new Set(), 'left'],
+    [renderer.rightCtx, allDiffIds(scene.id), 'right'],
   ]) {
     ctx.save();
     ctx.clearRect(0, 0, SCENE_SIZE.width, SCENE_SIZE.height);
@@ -121,6 +148,9 @@ export function renderFrame(renderer, state, scene) {
     if (state.hinted) {
       const hinted = diffs.find((d) => d.id === state.hinted);
       if (hinted && !state.found.has(hinted.id)) drawHintRing(ctx, hinted, now);
+    }
+    if (renderer.crosshair?.visible && renderer.crosshair.panel === side) {
+      drawCrosshair(ctx, renderer.crosshair);
     }
     ctx.restore();
   }

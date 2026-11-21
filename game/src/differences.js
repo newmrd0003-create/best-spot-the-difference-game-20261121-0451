@@ -40,6 +40,33 @@ export const DIFFERENCES = {
     { id: 'seaweed-frond', x: 508, y: 262, r: 26, label: 'the seaweed grew an extra frond' },
     { id: 'fish-direction', x: 384, y: 186, r: 26, label: 'the little yellow fish turned around' },
   ],
+  park: [
+    { id: 'kite-vanished', x: 480, y: 72, r: 28, label: 'the kite vanished from the sky' },
+    { id: 'bird-vanished', x: 200, y: 58, r: 26, label: 'a bird flew out of the sky' },
+    { id: 'tree-apple', x: 118, y: 118, r: 26, label: 'an apple fell off the tree' },
+    { id: 'blanket-stripe', x: 300, y: 336, r: 28, label: 'the picnic blanket stripe changed colour' },
+    { id: 'bottle-vanished', x: 382, y: 298, r: 26, label: 'the bottle vanished from the basket' },
+    { id: 'ball-colour', x: 520, y: 362, r: 26, label: 'the beach ball changed colour' },
+    { id: 'flower-count', x: 92, y: 382, r: 26, label: 'a flower is missing from the grass' },
+  ],
+  library: [
+    { id: 'lamp-colour', x: 92, y: 148, r: 28, label: 'the reading lamp changed colour' },
+    { id: 'book-vanished', x: 300, y: 118, r: 26, label: 'a book is missing from the shelf' },
+    { id: 'clock-hands', x: 520, y: 72, r: 28, label: 'the wall clock hands moved' },
+    { id: 'cat-vanished', x: 468, y: 302, r: 28, label: 'the cat on the armchair is gone' },
+    { id: 'mug-vanished', x: 202, y: 322, r: 26, label: 'the mug vanished from the table' },
+    { id: 'pot-colour', x: 122, y: 318, r: 26, label: 'the plant pot changed colour' },
+    { id: 'window-bird', x: 420, y: 88, r: 26, label: 'a bird appeared outside the window' },
+  ],
+  space: [
+    { id: 'earth-cloud', x: 300, y: 178, r: 28, label: 'a cloud drifted off the Earth' },
+    { id: 'star-vanished', x: 452, y: 78, r: 24, label: 'a star faded out of the window' },
+    { id: 'patch-colour', x: 150, y: 298, r: 26, label: 'the astronaut patch changed colour' },
+    { id: 'panel-light', x: 500, y: 118, r: 24, label: 'a panel light went dark' },
+    { id: 'leaf-vanished', x: 92, y: 358, r: 26, label: 'the plant lost a leaf' },
+    { id: 'mug-moved', x: 382, y: 298, r: 26, label: 'the floating mug drifted away' },
+    { id: 'button-colour', x: 520, y: 332, r: 26, label: 'the big button changed colour' },
+  ],
 };
 
 // differencesFor(sceneId) — the seven differences of one scene, in order.

@@ -153,6 +153,55 @@
   }
   .big-btn:hover { background: #ffe08a; }
   .keys { font-size: 13px; color: #9a92b5; margin-top: 12px; }
+  #btn-lens.on { background: #8a6d1f; border-color: #ffd76a; color: #ffe9a8; }
+  #scene-nav {
+    width: 1232px;
+    max-width: 100%;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 2px 0 10px;
+  }
+  #scene-nav button {
+    font-family: inherit;
+    font-size: 13px;
+    background: #241f3d;
+    color: #e8dfc8;
+    border: 1px solid #4a3f6e;
+    border-radius: 999px;
+    padding: 5px 13px;
+    cursor: pointer;
+  }
+  #scene-nav button:hover { border-color: #ffd76a; }
+  #scene-nav button.active { background: #3a2c10; border-color: #ffd76a; color: #ffd76a; font-weight: bold; }
+  #howto {
+    width: 1232px;
+    max-width: 100%;
+    background: #1e1933;
+    border: 1px solid #4a3f6e;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #e8dfc8;
+  }
+  #howto h2 { font-size: 17px; color: #ffd76a; margin-bottom: 6px; }
+  #howto b { color: #ffd76a; }
+  #howto .keys-line { color: #9a92b5; font-size: 13px; margin-top: 8px; }
+  #lens {
+    position: fixed;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 20;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+  #lens.hidden { display: none; }
+  #lens canvas { display: block; width: 180px; height: 180px; }
   footer { margin-top: 6px; font-size: 13px; color: #9a92b5; }
 </style>
 </head>
@@ -166,10 +215,12 @@
     <span class="pill" id="hud-combo"></span>
     <span class="pill" id="hud-time">2:00</span>
     <button id="hud-hint-btn" type="button">💡 Hint (<span id="hud-hints">Hints 3</span>)</button>
+    <button id="btn-lens" type="button">🔍 Lens off</button>
     <button id="btn-mute" type="button">🔊 Sound on</button>
   </div>
 </header>
 <div id="time-track"><div id="time-bar"></div></div>
+<div id="scene-nav"></div>
 
 <div class="stage">
   <div id="panels">
@@ -187,11 +238,11 @@
     <div class="card">
       <h2>🏮 Lantern Town</h2>
       <p>Two pictures hang side by side — but they are <b>not</b> the same.
-      Find all <b>7 differences</b> in each scene before the lantern burns down.
+      Find all <b>7 differences</b> in each of the <b>six scenes</b> before the lantern burns down.
       Click a difference on either picture to ring it in gold.</p>
       <div id="level-list"></div>
       <button class="big-btn" id="btn-play" type="button">▶ Start the hunt</button>
-      <div class="keys">Click a difference · H for a hint (3 per level) · wrong clicks cost 3 seconds</div>
+      <div class="keys">Click a difference · H for a hint (3 per level) · wrong clicks cost 3 seconds · L toggles the 2× magnifier · arrows + Enter play by keyboard</div>
     </div>
   </div>
 
@@ -217,7 +268,7 @@
     <div class="card">
       <h2>🎉 Lantern Master!</h2>
       <div class="big">★★★</div>
-      <p>You found every difference in all three scenes of Lantern Town.</p>
+      <p>You found every difference in all six scenes of Lantern Town.</p>
       <p id="all-score"></p>
       <button class="big-btn" id="btn-again" type="button">↻ Play again</button>
     </div>
@@ -225,7 +276,18 @@
 </div>
 
 <div id="toast"></div>
-<footer>Three original scenes, painted live in your browser · no downloads, no accounts · Lantern Town © 2026</footer>
+<div id="howto">
+  <h2>How to play</h2>
+  <p>Two pictures hang side by side — the left is the <b>original</b>, the right hides <b>7 sneaky shifts</b>:
+  things removed, recoloured, moved, resized, flipped or added. Click a difference on <b>either</b> picture to ring it
+  in gold. Every difference is fair: big enough to see, small enough to miss. Six scenes, <b>42 differences</b> in all —
+  a dusk harbour, a night market, a coral garden, a sunny park picnic, a cozy library and a space station window.
+  Wrong clicks cost 3 seconds; a hint (3 per scene) points at one hidden difference and costs 50 points.</p>
+  <p class="keys-line">Mouse: click to guess · hover = magnifier (when on) · Keys: ← ↑ ↓ → move the crosshair, Enter guess,
+  Tab switch picture, H hint, L lens, N next scene, R restart, 1–6 jump to a scene.</p>
+</div>
+<div id="lens" class="hidden"><canvas id="lens-canvas" width="180" height="180"></canvas></div>
+<footer>Six original scenes, painted live in your browser · 42 differences · no downloads, no accounts · Lantern Town © 2026</footer>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>

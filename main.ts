@@ -5,6 +5,10 @@
 // and writes /output/dossier.json with the vendored make.fun library, so the
 // judge can read the game from its screenshots and its source outline.
 //
+// V2: six scenes and 42 differences (harbour, market, coral, park, library,
+// space), a 2x magnifier lens, full keyboard play, a scene picker and a
+// How-to-play section — the same hand-in shape as v1, a bigger game inside.
+//
 // The copy is deterministic: directory entries are walked in sorted order
 // and file bytes are copied verbatim, so two runs write identical bytes.
 //

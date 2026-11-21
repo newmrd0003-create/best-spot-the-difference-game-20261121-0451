@@ -5,7 +5,9 @@
 // the timer is frozen for shots so the clock never drifts between runs.
 //
 //   start    — the title screen over the harbour scene
-//   play     — mid-play on the harbour, 2 of 7 found, 5 still hidden
+//   play     — mid-play on the sunny park, 3 of 7 found, 4 still hidden
+//   harbour  — mid-play on the harbour, 2 of 7 found, 5 still hidden
+//   library  — mid-play in the library, 3 of 7 found, 4 still hidden
 //   market   — mid-play on the night market, 3 of 7 found
 //   complete — the level-complete card after clearing the harbour
 //
@@ -23,12 +25,36 @@ export function applyShot(state, timer, shot) {
     return true;
   }
   if (shot === 'play') {
+    startLevel(state, 3);
+    state.score = 360;
+    state.timeLeft = 84;
+    const diffs = differencesFor('park');
+    registerFind(state, diffs[0].id);
+    registerFind(state, diffs[2].id);
+    registerFind(state, diffs[4].id);
+    state.combo = 3;
+    timer.running = false;
+    return true;
+  }
+  if (shot === 'harbour') {
     startLevel(state, 0);
     state.timeLeft = 78;
     const diffs = differencesFor('harbour');
     registerFind(state, diffs[0].id);
     registerFind(state, diffs[3].id);
     state.combo = 2;
+    timer.running = false;
+    return true;
+  }
+  if (shot === 'library') {
+    startLevel(state, 4);
+    state.score = 610;
+    state.timeLeft = 58;
+    const diffs = differencesFor('library');
+    registerFind(state, diffs[0].id);
+    registerFind(state, diffs[2].id);
+    registerFind(state, diffs[4].id);
+    state.combo = 3;
     timer.running = false;
     return true;
   }
